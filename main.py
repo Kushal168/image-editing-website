@@ -8,6 +8,10 @@ ALLOWED_EXTENSIONS = {'pdf','png', 'webp', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+def processImage(filename,operation):
+    print(f"======>>>{filename}************{operation}")
+
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -26,13 +30,12 @@ def about():
 def edit():
     if request.method == "POST":
         print("Form data:", request.form)
+        operation = request.form.get("operation")
         if 'file' not in request.files:
             flash('No file part')
             return "error"
         file = request.files['file']
         print("_____",request.files ,"++++",file.filename)
-        # If the user does not select a file, the browser submits an
-        # empty file without a filename.
         if file.filename == '':
             print("=====>>>",file.filename)
             flash('No selected file')
@@ -40,7 +43,7 @@ def edit():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            # processImage()
+            processImage(filename,operation)
             return render_template("index.html")
     return  render_template("index.html")
 
